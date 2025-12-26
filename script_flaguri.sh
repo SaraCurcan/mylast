@@ -2,21 +2,16 @@
 
 file_data="file" #fisier de intrare
 
-
 n=0 		#nr de linii de afisat
 p=""		#timp specificat
 s=""		#timp minim
 t=""		#timp maxim
 
+
 #veirifcarea flagurilor
 while [ $# -gt 0 ]; do
 	case "$1" in
 	-)n 
-#veirifcarea flagurilor
-while [ $# -gt 0 ]; do
-	case "$1" in
-	-n) 
-
 		n="$2"
 	 	shift 2
 	;; 
@@ -43,13 +38,8 @@ login_sursa=()		###retine sursa(tty, seat0 etc)
 login_time=() 		###retine data si ora de login pt fiecare user
 
 contor=0    		###contorul pentru -n
-<<<<<<< HEAD
 while read -r DATA ORA ACTIUNE USER SURSA; do
 	timp="$DATA-$ORA"
-
-while read -r DATA ORA REST; do
-	timp="$DATA $ORA"
-
 	if [ -n "$s" ]; then       
 		[["$timp" < "$s"]] && continue  
 	fi
@@ -58,7 +48,6 @@ while read -r DATA ORA REST; do
 		["$timp" > "$t"] && continue
 	fi
 	
-
 	date_user="$USER-$SURSA"     ###datele sunt pastrate pentru fiecare sesiune(login_time sau login_sursa)
 	
 	if ["$actiune" = "login"]; then 
@@ -69,33 +58,6 @@ while read -r DATA ORA REST; do
 	contor=$((contor+1))	
 	if [ "$n" -ne 0 ] && [ "$contor" -ge "$n" ];then
 		break;
-=======
-	###identificare user, sursa si actiunea (pastrate in variabila REST)
-	if echo "$REST" | grep -q "reebot"; then
-		USER="reboot"
-		SURSA="system_boot"
-		ACTIUNE="reebot"	
-	elif echo "$REST" | grep -q "shutdown"; then
-		USER="shutdown"
-		SURSA="-"
-		ACTIUNE="shutdown"	
-	elif echo "$REST"| grep -q "login_screen"; then
-		USER="gdm"
-		SURSA="seat0"
-		ACTIUNE="login"
-	else 
-		USER=$(echo "$REST" | awk '{print $1}')
-		SURSA=$(echo "$REST" | awk '{print $2}')
-		ACTIUNE="login"
-	fi
-	
-	#####afisare
-	echo "$USER $SURSA $DATA $ORA $ACTIUNE"
-	contor= $((contor + 1))
-	###conditia de oprire pt numar maxim de linii -n:
-	if [ "$n" -ne 0 ] $$ [ "$contor" -ge "$n" ]; then
-		break
->>>>>>> cbe3e0b (Am fixat scriptul pentru a lucra cu datele preluate din auth.log)
 	fi
 done < "nume_fisier"
 	
