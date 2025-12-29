@@ -5,35 +5,34 @@ for file in /var/log/auth.log.4.gz /var/log/auth.log.3.gz /var/log/auth.log.2.gz
     continue
     fi
 zcat -f "$file" | while read -r line; do
-    if echo "$line" | grep -q "New seat seat0"; then
-        data=$(echo "$line" | awk -F [T] '{print $1}')
-        ora=$(echo "$line" | awk -F [T.] '{print $2}')
-         echo "$data $ora reboot system_boot"
-    fi
-    if echo "$line" | grep -q "New session .* of user gdm"; then
-        data_1=$(echo "$line" | awk -F [T] '{print $1}')
-        ora_1=$(echo "$line" | awk -F [T.] '{print $2}')
-        echo "$data_1 $ora_1 gdm seat0 login_screen"
-    fi
-   if echo "$line" | grep -q "systemd-logind.*: New session .* of user .*"; then
-        if ! echo "$line" | grep -q "of user gdm"; then
-        data_2=$(echo "$line" | awk -F [T] '{print $1}')
-        ora_2=$(echo "$line" | awk -F [T.] '{print $2}')
-        pers=$(echo "$line" | awk -F 'of user ' '{print $2}' | tr -d '.')
-        echo "$data_2 $ora_2 $pers"
-        fi
-    fi
-    if echo "$line" | grep -q "System is rebooting"; then
-        data_3=$(echo "$line" | awk -F [T] '{print $1}')
-        ora_3=$(echo "$line" | awk -F [T.] '{print $2}')
-        echo "$data_3 $ora_3 reboot system_boot"
-    fi
-    if echo "$line" | grep -q "System is powering down"; then
-        data_4=$(echo "$line" | awk -F [T] '{print $1}')
-        ora_4=$(echo "$line" | awk -F [T.] '{print $2}')
-        echo "$data_4 $ora_4 shutdown"
-    fi
-
+    case "$line" in
+        *"New seat seat0"*|*"System is rebooting"*|*"System is powering down"*|*"New session"*)
+            data=$(echo "$line" | awk -F 'T' '{print $1}')
+            ora=$(echo "$line" | awk -F'[T.]' '{print $2}')
+            ;;
+        *)
+        continue
+        ;;
+    esac
+    case "$line" in
+        *"New seat seat0"*)
+            echo "$data $ora reboot system_boot"
+            ;;
+        *"systemd-logind"*New\ session*of\ user\ gdm*)
+            echo "$data $ora gdm seat0 login_screen"
+            ;;
+        *"systemd-logind"*New\ session*of\ user*)
+            if [[ "$line" != *"of user gdm"* ]]; then
+            pers=$(echo "$line" | awk -F 'of user ' '{print $2}' | tr -d '.')
+            echo "$data $ora $pers"
+            fi
+            ;;
+        *"System is rebooting"*)
+            echo "$data $ora reboot system_boot"
+            ;;
+        *"System is powering down"*)
+             echo "$data $ora shutdown"
+             ;;
+        esac
 done
-done 
-#1,40 min...
+done
