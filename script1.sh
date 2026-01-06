@@ -74,7 +74,7 @@ while read -r DATA ORA REST; do
 	if [ "$n" -ne 0 ] $$ [ "$contor" -ge "$n" ]; then
 		break
 	fi
-done < "file_data"
+done < "$file_data"
 	
 	
 	
