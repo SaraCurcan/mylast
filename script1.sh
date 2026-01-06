@@ -41,18 +41,18 @@ while read -r DATA ORA REST; do
 	timp="$DATA $ORA"
 
 	if [ -n "$s" ]; then       
-		[["$timp" < "$s"]] && continue  
+		[[ "$timp" < "$s" ]] && continue  
 	fi
 	
 	if [ -n "$t" ]; then 
-		["$timp" > "$t"] && continue
+		[ "$timp" > "$t" ] && continue
 	fi
 	
 	###identificare user, sursa si actiunea (pastrate in variabila REST)
-	if echo "$REST" | grep -q "reebot"; then
+	if echo "$REST" | grep -q "reboot"; then
 		USER="reboot"
 		SURSA="system_boot"
-		ACTIUNE="reebot"	
+		ACTIUNE="reboot"	
 	elif echo "$REST" | grep -q "shutdown"; then
 		USER="shutdown"
 		SURSA="-"
@@ -69,9 +69,9 @@ while read -r DATA ORA REST; do
 	
 	#####afisare
 	echo "$USER $SURSA $DATA $ORA $ACTIUNE"
-	contor= $((contor + 1))
+	contor=$((contor + 1))
 	###conditia de oprire pt numar maxim de linii -n:
-	if [ "$n" -ne 0 ] $$ [ "$contor" -ge "$n" ]; then
+	if [ "$n" -ne 0 ] && [ "$contor" -ge "$n" ]; then
 		break
 	fi
 done < "$file_data"
